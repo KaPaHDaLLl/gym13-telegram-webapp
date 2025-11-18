@@ -6,79 +6,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root {
-      --bg: #ffffff;
-      --fg: #111111;
-      --card-bg: #f3f3f3;
-      --accent: #2b7cff;
-      --border-radius: 12px;
-    }
+  :root {
+    --bg: #ffffff;
+    --fg: #111111;
+    --card-bg: #f3f3f3;
+    --accent: #2b7cff;
+    --accent-text: #ffffff;
+    --border-subtle: rgba(0,0,0,0.12);
+    --radius: 16px;
+  }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+  }
 
-    .app {
-      padding: 16px;
-    }
+  .app {
+    padding: 16px;
+  }
 
-    h1 {
-      margin: 0 0 4px;
-      font-size: 20px;
-    }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 20px;
+  }
 
-    .subtitle {
-      margin: 0 0 16px;
-      font-size: 13px;
-      opacity: 0.7;
-    }
+  .subtitle {
+    margin: 0 0 16px;
+    font-size: 13px;
+    opacity: 0.8;
+  }
 
-    .section {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      padding: 12px;
-      margin-bottom: 12px;
-    }
+  .section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-subtle);
+  }
 
-    .section-title {
-      margin: 0 0 8px;
-      font-size: 14px;
-      font-weight: 600;
-    }
+  .section-title {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.9;
+  }
 
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+  .btn-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-    button {
-      flex: 1 1 calc(50% - 4px);
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-      background: var(--accent);
-      color: #ffffff;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
+  button {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-text);
+  }
 
-    button.btn-secondary {
-      background: transparent;
-      color: inherit;
-      border: 1px solid rgba(0,0,0,0.15);
-    }
+  button.btn-secondary {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border-subtle);
+  }
 
-    @media (max-width: 360px) {
-      button {
-        flex-basis: 100%;
-      }
-    }
-  </style>
+  button:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+</style>
 </head>
 <body>
   <div class="app">
@@ -113,32 +115,56 @@
   </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+  const tg = window.Telegram.WebApp;
+  tg.expand();
 
-    // Небольшая подстройка под тему Telegram
-    (function applyTheme() {
-      const p = tg.themeParams || {};
-      if (p.bg_color) document.body.style.backgroundColor = p.bg_color;
-      if (p.text_color) document.body.style.color = p.text_color;
-    })();
+  // Подстраиваемся под тему Telegram
+  (function applyTheme() {
+    const p = tg.themeParams || {};
+    const root = document.documentElement;
 
-    function sendAction(action) {
-      tg.sendData(JSON.stringify({ action }));
-      tg.close();
-    }
+    const bg = p.bg_color || "#ffffff";
+    const fg = p.text_color || "#111111";
+    const accent = p.button_color || "#2b7cff";
+    const accentText = p.button_text_color || "#ffffff";
 
-    document.getElementById("btnToday").onclick = () => sendAction("schedule_today");
-    document.getElementById("btnTomorrow").onclick = () => sendAction("schedule_tomorrow");
-    document.getElementById("btnWeek").onclick = () => sendAction("schedule_week");
+    // простой признак тёмной темы
+    const isDark = (p.bg_color || "").toLowerCase() !== "#ffffff"
+                   && (p.bg_color || "").toLowerCase() !== "#fff";
 
-    document.getElementById("btnSchool").onclick = () => sendAction("school_info");
-    document.getElementById("btnContacts").onclick = () => sendAction("contacts_info");
-    document.getElementById("btnVacations").onclick = () => sendAction("vacations_info");
-    document.getElementById("btnSocials").onclick = () => sendAction("socials_info");
+    root.style.setProperty("--bg", bg);
+    root.style.setProperty("--fg", fg);
+    root.style.setProperty("--accent", accent);
+    root.style.setProperty("--accent-text", accentText);
+    root.style.setProperty(
+      "--card-bg",
+      isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.03)"
+    );
+    root.style.setProperty(
+      "--border-subtle",
+      isDark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.12)"
+    );
+  })();
 
-    document.getElementById("btnHelp").onclick = () => sendAction("open_help");
-  </script>
+  function sendAction(action) {
+    tg.sendData(JSON.stringify({ action }));
+    tg.close();
+  }
+
+  // 📅 Расписание
+  document.getElementById("btnToday").onclick    = () => sendAction("schedule_today");
+  document.getElementById("btnTomorrow").onclick = () => sendAction("schedule_tomorrow");
+  document.getElementById("btnWeek").onclick     = () => sendAction("schedule_week");
+
+  // 🏫 О гимназии
+  document.getElementById("btnSchool").onclick   = () => sendAction("school_info");
+  document.getElementById("btnContacts").onclick = () => sendAction("contacts_info");
+  document.getElementById("btnVacations").onclick = () => sendAction("vacations_info");
+  document.getElementById("btnSocials").onclick   = () => sendAction("socials_info");
+
+  // 👤 Главное меню бота
+  document.getElementById("btnHelp").onclick     = () => sendAction("open_help");
+</script>
 </body>
 </html>
 
