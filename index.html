@@ -2,27 +2,143 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Меню гимназии №13</title>
+  <title>Меню гимназии № 13</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; }
-    button { padding: 12px 16px; border-radius: 8px; border: none; font-size: 16px; }
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --card-bg: #f3f3f3;
+      --accent: #2b7cff;
+      --border-radius: 12px;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .app {
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .section {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      flex: 1 1 calc(50% - 4px);
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      background: var(--accent);
+      color: #ffffff;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    button.btn-secondary {
+      background: transparent;
+      color: inherit;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    @media (max-width: 360px) {
+      button {
+        flex-basis: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>Меню гимназии № 13</h2>
-  <p>Выберите действие:</p>
-  <button id="btnScheduleToday">📅 Расписание на сегодня</button>
+  <div class="app">
+    <h1>Меню гимназии № 13</h1>
+    <p class="subtitle">Выберите действие — бот отправит нужную команду в чат.</p>
+
+    <div class="section">
+      <p class="section-title">📅 Расписание</p>
+      <div class="btn-row">
+        <button id="btnToday">Сегодня</button>
+        <button id="btnTomorrow">Завтра</button>
+        <button id="btnWeek">Неделя</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">🏫 О гимназии</p>
+      <div class="btn-row">
+        <button id="btnSchool">О школе</button>
+        <button id="btnContacts">Контакты</button>
+        <button id="btnVacations" class="btn-secondary">Каникулы</button>
+        <button id="btnSocials" class="btn-secondary">Соцсети</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">👤 Мой бот</p>
+      <div class="btn-row">
+        <button id="btnHelp" class="btn-secondary">Главное меню бота</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    document.getElementById('btnScheduleToday').onclick = () => {
-      tg.sendData(JSON.stringify({ action: 'schedule_today' }));
+    // Небольшая подстройка под тему Telegram
+    (function applyTheme() {
+      const p = tg.themeParams || {};
+      if (p.bg_color) document.body.style.backgroundColor = p.bg_color;
+      if (p.text_color) document.body.style.color = p.text_color;
+    })();
+
+    function sendAction(action) {
+      tg.sendData(JSON.stringify({ action }));
       tg.close();
-    };
+    }
+
+    document.getElementById("btnToday").onclick = () => sendAction("schedule_today");
+    document.getElementById("btnTomorrow").onclick = () => sendAction("schedule_tomorrow");
+    document.getElementById("btnWeek").onclick = () => sendAction("schedule_week");
+
+    document.getElementById("btnSchool").onclick = () => sendAction("school_info");
+    document.getElementById("btnContacts").onclick = () => sendAction("contacts_info");
+    document.getElementById("btnVacations").onclick = () => sendAction("vacations_info");
+    document.getElementById("btnSocials").onclick = () => sendAction("socials_info");
+
+    document.getElementById("btnHelp").onclick = () => sendAction("open_help");
   </script>
 </body>
 </html>
+
