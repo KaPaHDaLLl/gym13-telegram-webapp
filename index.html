@@ -128,6 +128,13 @@
   // Расширяем приложение на весь экран
   tg.expand();
 
+  // --- НОВОЕ: берём chat_id из query-параметра cid (?cid=123456789) ---
+  const urlParams = new URLSearchParams(window.location.search);
+  const CHAT_ID = urlParams.get("cid");
+
+  // --- НОВОЕ: URL шлюз-функции в Yandex Cloud (ЗАМЕНИ на свой!) ---
+  const GATEWAY_URL = "https://functions.yandexcloud.net/d4ee0lpdh5kcbflvev3q";
+
   // Подстраиваемся под тему Telegram
   (function applyTheme() {
     const p = tg.themeParams || {};
@@ -156,10 +163,28 @@
     );
   })();
 
-  function sendAction(action) {
-    // Отправляем данные в бота
-    tg.sendData(JSON.stringify({ action: action }));
-    
+  // --- ИЗМЕНЕНО: вместо tg.sendData используем fetch к шлюзу ---
+  async function sendAction(action) {
+    if (!CHAT_ID) {
+      console.error("CHAT_ID не передан в URL (cid=)");
+      alert("Ошибка: не удалось определить чат. Попробуйте открыть меню ещё раз.");
+      return;
+    }
+
+    try {
+      await fetch(GATEWAY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          action: action,
+        }),
+      });
+    } catch (e) {
+      console.error("Ошибка при обращении к шлюзу WebApp:", e);
+      // при желании можно показать alert
+    }
+
     // Закрываем Web App после отправки
     tg.close();
   }
