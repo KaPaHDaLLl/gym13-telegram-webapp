@@ -70,7 +70,6 @@
     color: var(--fg);
   }
 
-  /* можно оставить на будущее, но сейчас он визуально тот же */
   button.btn-secondary {
     background: transparent;
     color: var(--fg);
@@ -80,6 +79,10 @@
   button:disabled {
     opacity: 0.45;
     cursor: default;
+  }
+
+  button:active {
+    opacity: 0.7;
   }
 </style>
 </head>
@@ -116,7 +119,14 @@
   </div>
 
   <script>
+  // КРИТИЧЕСКИ ВАЖНО: инициализация Web App
   const tg = window.Telegram.WebApp;
+  
+  // Сообщаем Telegram, что приложение готово
+  tg.ready();
+  
+  // Расширяем приложение на весь экран
+  tg.expand();
 
   // Подстраиваемся под тему Telegram
   (function applyTheme() {
@@ -147,7 +157,10 @@
   })();
 
   function sendAction(action) {
-    tg.sendData(JSON.stringify({ action }));
+    // Отправляем данные в бота
+    tg.sendData(JSON.stringify({ action: action }));
+    
+    // Закрываем Web App после отправки
     tg.close();
   }
 
@@ -167,4 +180,3 @@
 </script>
 </body>
 </html>
-
